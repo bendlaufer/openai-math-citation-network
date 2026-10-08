@@ -75,17 +75,20 @@ def rankings():
 def cycles():
     examples=INPUTS['cycles']
     totals={3:28,4:12,5:4}
-    fig,axs=plt.subplots(1,3,figsize=(19,6),layout='constrained')
-    for ax,example in zip(axs,examples):
+    fig,axes=plt.subplots(2,3,figsize=(19,10),layout='constrained',gridspec_kw={'height_ratios':[1,1.35]})
+    axs=axes[0]
+    for column,(ax,example) in enumerate(zip(axs,examples)):
         nodes=example['nodes'];k=len(nodes)
         g=nx.DiGraph();g.add_edges_from((i,(i+1)%k) for i in range(k))
         positions=nx.circular_layout(g)
         nx.draw_networkx_edges(g,positions,ax=ax,arrows=True,arrowsize=24,node_size=600,edge_color='#8495a4',width=1.8)
         nx.draw_networkx_nodes(g,positions,ax=ax,node_color='#346a9b',node_size=600)
         nx.draw_networkx_labels(g,positions,ax=ax,labels={i:str(i+1) for i in range(k)},font_color='white',font_size=12)
-        ax.set_title(f'{k}-paper cycle',fontsize=14)
-        legend='\n\n'.join(f'{i+1}. '+'\n   '.join(textwrap.wrap(cycle_label(n['title']),48)) for i,n in enumerate(nodes))
-        ax.text(0,-.08,legend,transform=ax.transAxes,va='top',fontsize=17,linespacing=1.35)
+        ax.set_title(f'{k}-paper cycle',fontsize=17)
+        legend='\n\n'.join(f'{i+1}. '+'\n   '.join(textwrap.wrap(n['title'],42,break_long_words=False,break_on_hyphens=False)) for i,n in enumerate(nodes))
+        list_ax=axes[1,column]
+        list_ax.text(0,1,legend,transform=list_ax.transAxes,va='top',fontsize=17,linespacing=1.35)
+        list_ax.axis('off')
         ax.set_ylim(-1.3,1.3);ax.set_xlim(-1.4,1.4);ax.axis('off')
     fig.suptitle('Citation cycles',fontsize=20)
     export(fig,'figure-03-cycles')
